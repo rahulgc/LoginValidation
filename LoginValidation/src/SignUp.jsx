@@ -24,19 +24,38 @@ export function SignUp() {
     console.log(errors.length);
   };
   useEffect(() => {
+    
     if (Object.keys(errors).length == 0 && submit) {
       setI(i + 1);
       localStorage.setItem(i, JSON.stringify(userInfo));
       console.log("Success");
-      document.getElementById("display").innerHTML = "SignUp Successful !";
+      document.getElementById("display").innerHTML = `
+      <h5>Sign Up Successsful !</h5>
+      <a href="/">Log In Now</a>`
     }
   }, [errors]);
   const validateInfo = (info) => {
     const errors = {};
+    let regex = /^[a-zA-Z0-9!@#$%^&*]{6,16}$/;
+    console.log(regex.test(info.password));
+    if (!info.firstName) {
+      errors.firstName = "FirstName cannot be empty!";
+    }
+    if (!info.lastName) {
+      errors.lastName = "LastName cannot be empty!";
+    }
+    if (!info.email) {
+      errors.email = "Email cannot be empty!";
+    }
+    if (!info.password) {
+      errors.password = "Password cannot be empty!";
+    } else if (!regex.test(info.password)) {
+      errors.password = `Password does not match pattern`;
+    }
     for (let i = 1; i <= localStorage.length; i++) {
       console.log(JSON.parse(localStorage.getItem(i)));
       if (JSON.parse(localStorage.getItem(i)).email === info.email) {
-        errors.email = "User already has a account with given email!";
+        errors.user = "User already has a account with given email!";
       }
     }
     return errors;
@@ -55,7 +74,7 @@ export function SignUp() {
             onChange={handleChange}
           />
           <br />
-          {/* <p>{error.email}</p> */}
+          <p>{errors.firstName}</p>
         </div>
         <div>
           <input
@@ -66,7 +85,10 @@ export function SignUp() {
             value={userInfo.lastName}
             onChange={handleChange}
           />
+          <br/>
+        <p>{errors.lastName}</p>
         </div>
+        
         <div>
           <input
             className="email"
@@ -77,6 +99,7 @@ export function SignUp() {
             onChange={handleChange}
           />
           <br />
+          <p>{errors.email}</p>
         </div>
         <div>
           <input
@@ -88,7 +111,7 @@ export function SignUp() {
             onChange={handleChange}
           />
           <br />
-          {/* <p>{error.password}</p> */}
+          <p>{errors.password}</p>
         </div>
         <div>
           <button className="button" type="submit">
@@ -97,7 +120,7 @@ export function SignUp() {
         </div>
       </form>
       <div id="display">
-        <p>{errors.email}</p>
+        <p>{errors.user}</p>
       </div>
     </div>
   );

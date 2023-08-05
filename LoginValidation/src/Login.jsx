@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const navigate=useNavigate();
   const initialValues = { email: "", password: "" };
   const [formInputs, setFormInputs] = useState(initialValues);
   const [error, setError] = useState({});
@@ -21,24 +23,35 @@ export default function Login() {
   useEffect(() => {
     if (Object.keys(error).length === 0 && isSubmit) {
       console.log("Login Success");
-      document.getElementById("display").innerHTML = "LogIn Successful !";
+      setTimeout(()=>{
+        navigate("/home");
+      },1000)
     }
   }, [error]);
   const validate = (values) => {
     let errors = {};
-    let regex = /^[a-zA-Z0-9!@#$%^&*]{6,16}$/;
-    console.log(regex.test(values.password));
 
-    if (!values.email) {
-      errors.email = "Email cannot be empty!";
+    if (!!values.email && !!values.password ) {
+      for (let i = 1; i <= localStorage.length; i++) {
+        console.log(JSON.parse(localStorage.getItem(i)).email);
+        console.log(values.email)
+        if ((JSON.parse(localStorage.getItem(i)).email === values.email)&&(JSON.parse(localStorage.getItem(i)).password === values.password)) {
+          return errors;
+        }
+      }
+      errors.password="email/password is incorrect";
+    }else{
+      errors.email="Email and Password cannot be empty";
     }
-    if (!values.password) {
-      errors.password = "Password cannot be empty!";
-    } else if (!regex.test(values.password)) {
-      errors.password = `Password does not match pattern`;
-    }
+    
     return errors;
   };
+  const handleClick=(e)=>{
+    e.preventDefault();
+    console.log("Inside")
+    navigate("/signUp");
+  
+  }
 
   return (
     <div>
@@ -54,7 +67,6 @@ export default function Login() {
             onChange={handleChange}
           />
           <br />
-          <p>{error.email}</p>
         </div>
         <div>
           <input
@@ -66,15 +78,17 @@ export default function Login() {
             onChange={handleChange}
           />
           <br />
-          <p>{error.password}</p>
         </div>
 
         <div>
           <button className="button" type="submit">
             Login
-          </button>
+          </button><br></br>
+          <a onClick={handleClick} href="">SignUp</a>
         </div>
-        <div id="display"></div>
+        <div id="display">
+          {Object.keys(error).length!==0?<p>{error.password}</p>:""}
+        </div>
       </form>
     </div>
   );
